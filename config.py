@@ -87,4 +87,10 @@ network_configs = {
         "rpc": avax_rpc
     },
     
+    "CUSTOM": {
+        "abi": sepolia_abi,
+        "contract_address": '',
+        "rpc": ''
+    },
+    
 }

@@ -4,10 +4,10 @@ import config
 from util import parse_main_address_file, parse_target_address_file, parse_network, parse_target_address
 
 class disperse:
-    def __init__(self, network, main_account_pk, target_address_list: list, values: list) -> None:
+    def __init__(self, network, abi, contract_address, rpc, main_account_pk, target_address_list: list, values: list) -> None:
         self.network = network
         # 根据 network 选择出对应的 contract_address，abi，rpc
-        self.abi, self.contract_address, self.rpc = parse_network(network=network)
+        self.abi, self.contract_address, self.rpc = abi, contract_address, rpc
         self.web3 = Web3(Web3.HTTPProvider(self.rpc))
         self.contract = self.web3.eth.contract(address=self.contract_address, abi=self.abi)
         self.main_account = self.web3.eth.account.from_key(main_account_pk)
@@ -55,3 +55,4 @@ if __name__ == '__main__':
     # values = [value, value, value, value, value]
     # for main_account_pk in main_account_pk_list:
     #     disperse_eth_unique(main_account_pk=main_account_pk, target_address_list=target_address_list, values=values)
+    print(1)

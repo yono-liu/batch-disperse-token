@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, jsonify
-from util import parse_target_address
+from util import parse_target_address, parse_network
 from disperse_eth import disperse
 import requests
 import os
@@ -24,6 +24,8 @@ def upload_file():
     output_address = request.form.get('output_address')
     private_key = str(request.form.get('private_key'))
     values = request.form.get('values')
+    custom_rpc = request.form.get('custom_rpc')
+    custom_contract = request.form.get('custom_contract')
     
     # 传输私钥，输出地址，以及对应的value
     
@@ -31,17 +33,26 @@ def upload_file():
         # 例如，使用web3.py来处理以太坊交易
     try:
         print('network:', network)
+        print('type(network):', type(network))
+        print('custom_rpc:', custom_rpc)
+        print('custom_contract:', custom_contract)
         print('output_address:', repr(output_address))
         print('private_key:', private_key)
         print('values:', values)
-        
         # 拆解地址，私钥，值
         output_addresses = parse_target_address(output_address)
         print(output_addresses)
         value_list = [float(values) for _ in range(len(output_addresses))]
         print(value_list)
-        
-        disperser = disperse(network=network, main_account_pk=private_key, target_address_list=output_addresses, values=value_list)
+                
+        abi, contract_address, rpc = parse_network(network=network)
+
+        if network == 'CUSTOM':
+            contract_address = custom_contract
+            rpc = custom_rpc
+
+        disperser = disperse(network=network, abi=abi, contract_address=contract_address, rpc=rpc, 
+                             main_account_pk=private_key, target_address_list=output_addresses, values=value_list)
         tx_hash = disperser.disperse_eth_unique()
         
         # disperser = disperse(network, private_key, output_address, values)

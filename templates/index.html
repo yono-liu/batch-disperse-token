@@ -108,43 +108,52 @@
             font-size: 0.9em; /* 可选：使文本稍微小一些 */
         }
         .loader {
-  border: 5px solid #f3f3f3; /* 轻灰色 */
-  border-top: 5px solid #3498db; /* 蓝色 */
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  animation: spin 2s linear infinite;
-  display: block;
-  margin: auto;
-}
+            border: 5px solid #f3f3f3; /* 轻灰色 */
+            border-top: 5px solid #3498db; /* 蓝色 */
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 2s linear infinite;
+            display: block;
+            margin: auto;
+        }
 
-.loader div {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  border: 5px solid transparent;
-  border-radius: 50%;
-  animation: spin 2s linear infinite;
-}
+        .loader div {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 5px solid transparent;
+            border-radius: 50%;
+            animation: spin 2s linear infinite;
+        }
 
-.loader div:nth-child(1) {
-  animation-delay: -0.8s;
-}
+        .loader div:nth-child(1) {
+            animation-delay: -0.8s;
+        }
 
-.loader div:nth-child(2) {
-  animation-delay: -0.4s;
-}
+        .loader div:nth-child(2) {
+            animation-delay: -0.4s;
+        }
 
-.loader div:nth-child(3) {
-  animation-delay: 0s;
-}
+        .loader div:nth-child(3) {
+            animation-delay: 0s;
+        }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .custom-network-input {
+            display: none; /* 默认不显示 */
+        }
+
+        /* 当custom-rpc和custom-contract的父元素被选中时，显示这些输入框 */
+        .form-group.network-CUSTOM .custom-network-input {
+            display: block;
+        }
         
     </style>
 </head>
@@ -155,6 +164,7 @@
         <div class="form-group">
             <label for="network-select">Choose Network:</label>
             <select id="network-select" name="network">
+                <option value="CUSTOM">Customize</option>
                 <option value="ETH">Ethereum</option>
                 <option value="BSC">Binance Smart Chain</option>
                 <option value="BASE">BASE</option>
@@ -166,6 +176,24 @@
                 <!-- Add more networks here -->
             </select>
         </div>
+        <!-- <div class="form-group">
+            <label for="custom-rpc">Custom RPC:</label>
+            <input type="text" id="custom-rpc" name="custom-rpc" placeholder="Enter rpc">
+        </div>
+        <div class="form-group">
+            <label for="custom-contract">Custom Contract Address:</label>
+            <input type="text" id="custom-contract" name="custom-contract" placeholder="Enter your contract dddress">
+        </div> -->
+        <div class="form-group network-CUSTOM">
+            <div class="custom-network-input">
+                <label for="custom-rpc">Custom RPC:</label>
+                <input type="text" id="custom-rpc" name="custom_rpc" placeholder="Enter rpc">
+            </div>
+            <div class="custom-network-input">
+                <label for="custom-contract">Custom Contract Address:(refer <a href="https://etherscan.io/address/0xd152f549545093347a162dce210e7293f1452150#code">here</a>)</label>
+                <input type="text" id="custom-contract" name="custom_contract" placeholder="Enter your contract address">
+            </div>
+        </div>   
         <div class="form-group">
             <label for="private-key">Main Wallet Private Key (with 0x) :</label>
             <input type="text" id="private-key" name="private_key" placeholder="Enter private key" pattern="^0x[a-fA-F0-9]{64}$" title="Private key should be 64 characters long and contain only letters and numbers.">
@@ -209,6 +237,16 @@
     const addressCount = document.querySelector('.address-count');
     const loadingElement = document.getElementById('loading');
 
+    const customRPC = document.getElementById('custom-rpc');
+    const customContract = document.getElementById('custom-contract');
+
+    networkSelect.addEventListener('change', function() {
+        const isCustomNetwork = this.value === 'CUSTOM';
+        const customInputs = document.querySelectorAll('.network-CUSTOM .custom-network-input');
+        customInputs.forEach(input => {
+            input.style.display = isCustomNetwork ? 'block' : 'none';
+        });
+    });
 
     outputAddressTextarea.addEventListener('input', function() {
         // 更新地址行数显示
@@ -256,8 +294,9 @@
         formData.append('output_address', outputAddressTextarea.value);
         formData.append('private_key', private_key.value);
         formData.append('values', valueInput.value);
-        loadingElement.style.display = 'block';
-
+        formData.append('custom_rpc', customRPC.value);
+        formData.append('custom_contract', customContract.value);
+        loadingElement.style.display = 'block'
 
         // 发送 POST 请求到后端
         fetch('/upload', {
