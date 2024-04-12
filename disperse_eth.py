@@ -4,7 +4,7 @@ import config
 from util import parse_main_address_file, parse_target_address_file, parse_network, parse_target_address
 
 class disperse:
-    def __init__(self, network, abi, contract_address, rpc, main_account_pk, target_address_list: list, values: list) -> None:
+    def __init__(self, network, abi, contract_address, rpc, main_account_pk) -> None:
         self.network = network
         # 根据 network 选择出对应的 contract_address，abi，rpc
         self.abi, self.contract_address, self.rpc = abi, contract_address, rpc
@@ -12,15 +12,16 @@ class disperse:
         self.contract = self.web3.eth.contract(address=self.contract_address, abi=self.abi)
         self.main_account = self.web3.eth.account.from_key(main_account_pk)
         self.main_account_pk = main_account_pk
-        self.target_address = target_address_list
-        self.values = [self.web3.to_wei(value, 'ether') for value in values]
+        # self.target_address = target_address_list
+        # self.values = [self.web3.to_wei(value, 'ether') for value in values]
     
-    def disperse_eth_unique(self):
-        call_function = self.contract.functions.disperseEther(self.target_address, self.values).build_transaction(
+    def disperse_eth_unique(self, target_address: list, target_values: list):
+        target_values = [self.web3.to_wei(value, 'ether') for value in target_values]
+        call_function = self.contract.functions.disperseEther(target_address, target_values).build_transaction(
             {'nonce': self.web3.eth.get_transaction_count(self.main_account.address),
             'from': self.main_account.address,
-            'value': sum(self.values),
-            'gasPrice': int(self.web3.eth.gas_price * 1.1),
+            'value': sum(target_values),
+            'gasPrice': int(self.web3.eth.gas_price * 1.2),
             'chainId': self.web3.eth.chain_id,
             }
         )

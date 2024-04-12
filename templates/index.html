@@ -155,6 +155,19 @@
             display: block;
         }
         
+        .result-box {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #d9edf7; /* 淡蓝色背景 */
+            border: 1px solid #bce8f1; /* 淡蓝色边框 */
+            border-radius: 4px;
+            color: #31708f; /* 文本颜色 */
+        }
+
+        .result-box pre {
+            white-space: pre-wrap; /* 保留空白符和换行符 */
+        }
+
     </style>
 </head>
 
@@ -176,14 +189,6 @@
                 <!-- Add more networks here -->
             </select>
         </div>
-        <!-- <div class="form-group">
-            <label for="custom-rpc">Custom RPC:</label>
-            <input type="text" id="custom-rpc" name="custom-rpc" placeholder="Enter rpc">
-        </div>
-        <div class="form-group">
-            <label for="custom-contract">Custom Contract Address:</label>
-            <input type="text" id="custom-contract" name="custom-contract" placeholder="Enter your contract dddress">
-        </div> -->
         <div class="form-group network-CUSTOM">
             <div class="custom-network-input">
                 <label for="custom-rpc">Custom RPC:</label>
@@ -221,6 +226,11 @@
             <div></div>
             <div></div>
             <div></div>
+        </div>
+
+        <div id="result-box" class="result-box" style="display: none;">
+            <h3>Transaction Result:</h3>
+            <pre id="result-text"></pre>
         </div>
     </div>
 
@@ -287,6 +297,8 @@
         sendTransaction();
     });
 
+
+
     function sendTransaction() {
         // 创建 FormData 对象
         let formData = new FormData();
@@ -311,11 +323,10 @@
             return response.json();
         })
         .then(data => {
-            if (data.error) {
-                alert(data.error);
-            } else {
-                alert(data.message);
-            }
+            const resultBox = document.getElementById('result-box');
+            const resultText = document.getElementById('result-text');     
+            resultBox.style.display = 'block';        
+            resultText.textContent = JSON.stringify(data, null, 2); // 使用 JSON.stringify 格式化输出         
         })
         .catch(error => {
             console.error('There has been a problem with your fetch operation:', error);
